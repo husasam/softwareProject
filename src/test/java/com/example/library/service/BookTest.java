@@ -1,30 +1,35 @@
+
 package com.example.library.service;
 
-
 import org.junit.jupiter.api.Test;
-
 import com.example.library.model.Book;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BookTest{
+public class BookTest {
 
     @Test
-    public void testBookGettersAndSetters(){
-       Book Book = new Book(null, null, null);
-        Book.setTitle("Java1");
-        Book.setAuthor("HSusam");
-        Book.setIsbn("12345");
+    public void testBookGettersAndSetters() {
+        Book book = new Book("Java1", "Husam", "12345");
 
-        assertEquals("Java1", Book.getTitle());
-        assertEquals("Husam", Book.getAuthor());
-        assertEquals("12345", Book.getIsbn());
+        // setters
+        book.setTitle("Java1");
+        book.setAuthor("Husam");
+        book.setIsbn("12345");
+
+        // getters
+        assertEquals("Java1", book.getTitle());
+        assertEquals("Husam", book.getAuthor());
+        assertEquals("12345", book.getIsbn());
     }
+
     @Test
-    public void testBookAvailability(){
-        Book book = new Book(" Code", " Mariii", "999");
+    public void testBookAvailability() {
+        Book book = new Book("Code", "Mariii", "999");
+
         assertTrue(book.isAvailable());
+
         book.setAvailable(false);
         assertFalse(book.isAvailable());
     }
 }
+
