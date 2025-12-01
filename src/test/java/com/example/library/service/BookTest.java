@@ -31,5 +31,41 @@ public class BookTest {
         book.setAvailable(false);
         assertFalse(book.isAvailable());
     }
+   
+    
+    @Test
+    public void testAvailabilityToggle() {
+        Book book = new Book("X", "Y", "Z");
+
+        assertTrue(book.isAvailable());
+
+        book.setAvailable(false);
+        assertFalse(book.isAvailable());
+
+        book.setAvailable(true);
+        assertTrue(book.isAvailable());
+    }
+    @Test
+    public void testSettersChangeValues() {
+        Book book = new Book("Old", "Someone", "000");
+
+        book.setTitle("roberthok");
+        book.setAuthor("sami syla");
+        book.setIsbn("999");
+
+        assertEquals("roberthok", book.getTitle());
+        assertEquals("sami syla", book.getAuthor());
+        assertEquals("999", book.getIsbn());
+    }
+    @Test
+    public void testBookConstructor() {
+        Book book = new Book("Algorithms", "CLRS", "111");
+
+        assertEquals("Algorithms", book.getTitle());
+        assertEquals("CLRS", book.getAuthor());
+        assertEquals("111", book.getIsbn());
+        assertTrue(book.isAvailable());  // عادة الكتب تكون available افتراضياً
+    }
+
 }
 

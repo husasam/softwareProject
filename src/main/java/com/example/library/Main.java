@@ -7,9 +7,9 @@ import com.example.library.service.*;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main {
+public class Main{
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
 
         BookRepository bookRepo = new BookRepository();
         UserRepository userRepo = new UserRepository();
@@ -22,10 +22,10 @@ public class Main {
         bookService.addBook("Java Basics", "111", "husam");
         bookService.addBook("python ", "222", "amjad");
 
-        CD cd1 = new CD("CD1", "Music Collection", null);
+        CD cd1 = new CD("CD1", "Music Collection", "1");
         cd1.setAvailable(true);
 
-        CD cd2 = new CD("CD2", "Learning English", null);
+        CD cd2 = new CD("CD2", "Learning English", "2");
         cd2.setAvailable(true);
 
         User user = new User("u1");
