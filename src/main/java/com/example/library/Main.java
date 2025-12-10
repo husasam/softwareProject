@@ -155,6 +155,6 @@ public class Main {
         User user = new User("u1");
         userService.addUser(user);
 
-        new LibraryMenu(bookService, borrowService, user, cd1, cd2).start();
-    }
+        LibraryMenu menu = new LibraryMenu(bookService, borrowService, user);
+        menu.start(cd1, cd2);    }
 }

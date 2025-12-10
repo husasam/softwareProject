@@ -13,41 +13,35 @@ import com.example.library.model.User;
 import com.example.library.service.BookService;
 import com.example.library.service.BorrowService;
 
-class LibraryMenu {
+public class LibraryMenu {
+
     private static final Logger logger = Logger.getLogger(LibraryMenu.class.getName());
 
     private final BookService bookService;
     private final BorrowService borrowService;
     private final User user;
-    private final CD cd1;
-    private final CD cd2;
 
-    public LibraryMenu(BookService bookService, BorrowService borrowService, User user, CD cd1, CD cd2) {
+    public LibraryMenu(BookService bookService, BorrowService borrowService, User user) {
         this.bookService = bookService;
         this.borrowService = borrowService;
         this.user = user;
-        this.cd1 = cd1;
-        this.cd2 = cd2;
     }
 
-    public void start() {
+    public void start(CD cd1, CD cd2) {
         try (Scanner sc = new Scanner(System.in)) {
             boolean running = true;
             while (running) {
                 printMenu();
-
                 String line;
                 if (!sc.hasNextLine()) {
                     logger.info("No input available. Exiting.");
                     break;
                 }
                 line = sc.nextLine().trim();
-
                 if (line.isEmpty()) {
                     logger.info("Empty input. Please enter a choice.");
                     continue;
                 }
-
                 int choice;
                 try {
                     choice = Integer.parseInt(line);
@@ -55,9 +49,8 @@ class LibraryMenu {
                     logger.warning("Invalid number: '" + line + "'. Please enter a valid integer.");
                     continue;
                 }
-
                 try {
-                    running = handleChoice(choice, sc);
+                    running = handleChoice(choice, sc, cd1, cd2);
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Unexpected error while handling choice " + choice, e);
                     running = false;
@@ -75,11 +68,10 @@ class LibraryMenu {
         logger.info("5. Return CD");
         logger.info("6. View Overdue Items");
         logger.info("0. Exit");
-        System.out.print("Choose: ");
+        logger.info("Choose: ");
     }
 
-    
-    private boolean handleChoice(int choice, Scanner sc) {
+    private boolean handleChoice(int choice, Scanner sc, CD cd1, CD cd2) {
         switch (choice) {
             case 1:
                 viewBooks();
@@ -91,7 +83,7 @@ class LibraryMenu {
                 returnBook(sc);
                 break;
             case 4:
-                borrowCd(sc);
+                borrowCd(sc, cd1, cd2);
                 break;
             case 5:
                 returnCd(sc);
@@ -101,7 +93,7 @@ class LibraryMenu {
                 break;
             case 0:
                 logger.info("Exiting application by user choice.");
-                return false; 
+                return false;
             default:
                 logger.warning("Invalid choice: " + choice);
                 break;
@@ -127,15 +119,12 @@ class LibraryMenu {
             logger.warning("Empty ISBN provided.");
             return;
         }
-
-        boolean ok;
         try {
-            ok = borrowService.borrowBook(user, isbn);
+            boolean ok = borrowService.borrowBook(user, isbn);
+            logger.info(ok ? "Borrowed successfully." : "Borrow failed.");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while borrowing book with ISBN: " + isbn, e);
-            return;
         }
-        logger.info(ok ? "Borrowed successfully." : "Borrow failed.");
     }
 
     private void returnBook(Scanner sc) {
@@ -145,35 +134,31 @@ class LibraryMenu {
             logger.warning("Empty ISBN provided.");
             return;
         }
-
-        boolean ok;
         try {
-            ok = borrowService.returnBook(isbn);
+            boolean ok = borrowService.returnBook(isbn);
+            logger.info(ok ? "Returned successfully." : "Return failed.");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while returning book with ISBN: " + isbn, e);
-            return;
         }
-        logger.info(ok ? "Returned successfully." : "Return failed.");
     }
 
-    private void borrowCd(Scanner sc) {
+    private void borrowCd(Scanner sc, CD cd1, CD cd2) {
         logger.info("Available CDs:");
         logger.info(cd1.getId() + " - " + cd1.getTitle());
         logger.info(cd2.getId() + " - " + cd2.getTitle());
         logger.info("Enter CD ID: ");
+
         String id = sc.nextLine().trim();
         if (id.isEmpty()) {
             logger.warning("Empty CD ID provided.");
             return;
         }
 
-        CD selectedCd;
+        CD selectedCd = null;
         if (id.equals(cd1.getId())) {
             selectedCd = cd1;
         } else if (id.equals(cd2.getId())) {
             selectedCd = cd2;
-        } else {
-            selectedCd = null;
         }
 
         if (selectedCd == null) {
@@ -181,14 +166,12 @@ class LibraryMenu {
             return;
         }
 
-        boolean ok;
         try {
-            ok = borrowService.borrowCD(user, selectedCd);
+            boolean ok = borrowService.borrowCD(user, selectedCd);
+            logger.info(ok ? "CD Borrowed" : "CD Borrow failed");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while borrowing CD: " + id, e);
-            return;
         }
-        logger.info(ok ? "CD Borrowed" : "CD Borrow failed");
     }
 
     private void returnCd(Scanner sc) {
@@ -198,15 +181,12 @@ class LibraryMenu {
             logger.warning("Empty CD ID provided.");
             return;
         }
-
-        boolean ok;
         try {
-            ok = borrowService.returnCD(id);
+            boolean ok = borrowService.returnCD(id);
+            logger.info(ok ? "CD Returned" : "CD Return failed");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while returning CD: " + id, e);
-            return;
         }
-        logger.info(ok ? "CD Returned" : "CD Return failed");
     }
 
     private void viewOverdue() {
