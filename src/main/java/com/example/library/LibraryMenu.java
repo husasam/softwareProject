@@ -1,6 +1,9 @@
 package com.example.library;
+
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.example.library.model.Book;
 import com.example.library.model.BorrowRecord;
@@ -9,11 +12,9 @@ import com.example.library.model.Media;
 import com.example.library.model.User;
 import com.example.library.service.BookService;
 import com.example.library.service.BorrowService;
-import java.util.logging.Logger;
 
-
-public class LibraryMenu {
-	private static final Logger logger = Logger.getLogger(LibraryMenu.class.getName());
+class LibraryMenu {
+    private static final Logger logger = Logger.getLogger(LibraryMenu.class.getName());
 
     private final BookService bookService;
     private final BorrowService borrowService;
@@ -30,100 +31,195 @@ public class LibraryMenu {
     }
 
     public void start() {
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            printMenu();
-            int choice = sc.nextInt();
-            sc.nextLine();
-            handleChoice(choice, sc);
+        try (Scanner sc = new Scanner(System.in)) {
+            boolean running = true;
+            while (running) {
+                printMenu();
+
+                String line;
+                if (!sc.hasNextLine()) {
+                    logger.info("No input available. Exiting.");
+                    break;
+                }
+                line = sc.nextLine().trim();
+
+                if (line.isEmpty()) {
+                    logger.info("Empty input. Please enter a choice.");
+                    continue;
+                }
+
+                int choice;
+                try {
+                    choice = Integer.parseInt(line);
+                } catch (NumberFormatException nfe) {
+                    logger.warning("Invalid number: '" + line + "'. Please enter a valid integer.");
+                    continue;
+                }
+
+                try {
+                    running = handleChoice(choice, sc);
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Unexpected error while handling choice " + choice, e);
+                    running = false;
+                }
+            }
         }
     }
 
     private void printMenu() {
-    	logger.info("\n===== Library System =====");
-    	logger.info("1. View Books");
-    	logger.info("2. Borrow Book");
-    	logger.info("3. Return Book");
-    	logger.info("4. Borrow CD");
-    	logger.info("5. Return CD");
-    	logger.info("6. View Overdue Items");
-    	logger.info("0. Exit");
+        logger.info("\n===== Library System =====");
+        logger.info("1. View Books");
+        logger.info("2. Borrow Book");
+        logger.info("3. Return Book");
+        logger.info("4. Borrow CD");
+        logger.info("5. Return CD");
+        logger.info("6. View Overdue Items");
+        logger.info("0. Exit");
         System.out.print("Choose: ");
     }
 
-    private void handleChoice(int choice, Scanner sc) {
+    
+    private boolean handleChoice(int choice, Scanner sc) {
         switch (choice) {
-            case 1 : viewBooks();
-            case 2 : borrowBook(sc);
-            case 3 : returnBook(sc);
-            case 4 : borrowCd(sc);
-            case 5 :returnCd(sc);
-            case 6 : viewOverdue();
-            case 0 :System.exit(0);
-            default : System.out.println("Invalid choice");
+            case 1:
+                viewBooks();
+                break;
+            case 2:
+                borrowBook(sc);
+                break;
+            case 3:
+                returnBook(sc);
+                break;
+            case 4:
+                borrowCd(sc);
+                break;
+            case 5:
+                returnCd(sc);
+                break;
+            case 6:
+                viewOverdue();
+                break;
+            case 0:
+                logger.info("Exiting application by user choice.");
+                return false; 
+            default:
+                logger.warning("Invalid choice: " + choice);
+                break;
         }
+        return true;
     }
 
     private void viewBooks() {
-        for (Book b : bookService.getAllBooks()) {
-        	logger.info(b.getTitle() + " | ISBN: " + b.getIsbn() + " | Available: " + b.isAvailable());
+        List<Book> books = bookService.getAllBooks();
+        if (books == null || books.isEmpty()) {
+            logger.info("No books available.");
+            return;
+        }
+        for (Book b : books) {
+            logger.info(b.getTitle() + " | ISBN: " + b.getIsbn() + " | Available: " + b.isAvailable());
         }
     }
 
     private void borrowBook(Scanner sc) {
-    	logger.info("Enter ISBN to borrow: ");
-        String isbn = sc.nextLine();
-        boolean ok = borrowService.borrowBook(user, isbn);
+        logger.info("Enter ISBN to borrow: ");
+        String isbn = sc.nextLine().trim();
+        if (isbn.isEmpty()) {
+            logger.warning("Empty ISBN provided.");
+            return;
+        }
+
+        boolean ok;
+        try {
+            ok = borrowService.borrowBook(user, isbn);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error while borrowing book with ISBN: " + isbn, e);
+            return;
+        }
         logger.info(ok ? "Borrowed successfully." : "Borrow failed.");
     }
 
     private void returnBook(Scanner sc) {
-    	logger.info("Enter ISBN to return: ");
-        String isbn = sc.nextLine();
-        boolean ok = borrowService.returnBook(isbn);
+        logger.info("Enter ISBN to return: ");
+        String isbn = sc.nextLine().trim();
+        if (isbn.isEmpty()) {
+            logger.warning("Empty ISBN provided.");
+            return;
+        }
+
+        boolean ok;
+        try {
+            ok = borrowService.returnBook(isbn);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error while returning book with ISBN: " + isbn, e);
+            return;
+        }
         logger.info(ok ? "Returned successfully." : "Return failed.");
     }
 
     private void borrowCd(Scanner sc) {
-    	logger.info("Available CDs:");
-    	logger.info(cd1.getId() + " - " + cd1.getTitle());
-    	logger.info(cd2.getId() + " - " + cd2.getTitle());
-
-    	logger.info("Enter CD ID: ");
-        String id = sc.nextLine();
-
-        CD selected = id.equals(cd1.getId()) ? cd1 :
-                      id.equals(cd2.getId()) ? cd2 : null;
-
-        if (selected == null) {
-        	logger.info("CD not found");
+        logger.info("Available CDs:");
+        logger.info(cd1.getId() + " - " + cd1.getTitle());
+        logger.info(cd2.getId() + " - " + cd2.getTitle());
+        logger.info("Enter CD ID: ");
+        String id = sc.nextLine().trim();
+        if (id.isEmpty()) {
+            logger.warning("Empty CD ID provided.");
             return;
         }
 
-        boolean ok = borrowService.borrowCD(user, selected);
+        CD selectedCd;
+        if (id.equals(cd1.getId())) {
+            selectedCd = cd1;
+        } else if (id.equals(cd2.getId())) {
+            selectedCd = cd2;
+        } else {
+            selectedCd = null;
+        }
+
+        if (selectedCd == null) {
+            logger.info("CD not found");
+            return;
+        }
+
+        boolean ok;
+        try {
+            ok = borrowService.borrowCD(user, selectedCd);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error while borrowing CD: " + id, e);
+            return;
+        }
         logger.info(ok ? "CD Borrowed" : "CD Borrow failed");
     }
 
     private void returnCd(Scanner sc) {
-    	logger.info("Enter CD ID to return: ");
-        String id = sc.nextLine();
-        boolean ok = borrowService.returnCD(id);
+        logger.info("Enter CD ID to return: ");
+        String id = sc.nextLine().trim();
+        if (id.isEmpty()) {
+            logger.warning("Empty CD ID provided.");
+            return;
+        }
+
+        boolean ok;
+        try {
+            ok = borrowService.returnCD(id);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error while returning CD: " + id, e);
+            return;
+        }
         logger.info(ok ? "CD Returned" : "CD Return failed");
     }
 
     private void viewOverdue() {
         List<BorrowRecord> overdue = borrowService.getOverdueBooks();
-
-        if (overdue.isEmpty()) {
-        	logger.info("No overdue items.");
+        if (overdue == null || overdue.isEmpty()) {
+            logger.info("No overdue items.");
             return;
         }
-
         for (BorrowRecord r : overdue) {
             Media m = r.getMedia();
-            System.out.println("User: " + r.getUserId() +
-                    " | Item: " + m.getTitle() +
-                    " | Due: " + r.getDueDate());
+            logger.info("User: " + r.getUserId() +
+                        " | Item: " + (m == null ? "<unknown>" : m.getTitle()) +
+                        " | Due: " + r.getDueDate());
         }
     }
 }
