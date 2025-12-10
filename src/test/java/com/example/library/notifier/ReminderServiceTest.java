@@ -4,10 +4,10 @@ import com.example.library.model.User;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 
-public class ReminderServiceTest {
+ class ReminderServiceTest {
 
     @Test
-    public void testObserverNotified() {
+     void testObserverNotified() {
         ReminderService svc = new ReminderService();
         Observer obs = mock(Observer.class);
         svc.register(obs);

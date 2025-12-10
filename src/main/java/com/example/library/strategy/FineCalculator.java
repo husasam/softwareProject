@@ -33,11 +33,11 @@ public class FineCalculator {
      * @param now    the current date
      * @return calculated fine
      */
-    public double calculate(BorrowRecord record, LocalDate now) {
-        long overdueDays = ChronoUnit.DAYS.between(record.getDueDate(), now);
+    public double calculate(BorrowRecord borrowRecord, LocalDate now) {
+        long overdueDays = ChronoUnit.DAYS.between(borrowRecord.getDueDate(), now);
         if (overdueDays <= 0) return 0.0;
 
-        Media m = record.getMedia();
+        Media m = borrowRecord.getMedia();
         if (m instanceof com.example.library.model.Book) {
             return bookStrategy.calculateFine((int) overdueDays);
         } else if (m instanceof com.example.library.model.CD) {

@@ -10,7 +10,7 @@ import com.example.library.model.User;
 import java.time.LocalDate;
 import java.util.List;
 
-public class BorrowServiceTest {
+ class BorrowServiceTest {
 
     private UserService userService;
     private User user;

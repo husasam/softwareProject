@@ -1,11 +1,10 @@
 package com.example.library.service;
 
 
-import com.example.library.service.AdminService;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AdminServiceTest{
+ class AdminServiceTest{
 
     @Test
     void testLoginSuccess(){

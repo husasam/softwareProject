@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import com.example.library.model.User;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserTest{
+ class UserTest{
 	@Test
     void testCreateUser() {
         User u = new User("u1");
