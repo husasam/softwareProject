@@ -17,4 +17,17 @@ public class ReminderServiceTest {
 
         verify(obs, times(1)).notify(eq(u), eq("overdue"));
     }
+    @Test
+    void testUnregister() {
+        ReminderService service = new ReminderService();
+        Observer obs = mock(Observer.class);
+
+        service.register(obs);
+        service.unregister(obs);
+
+        User user = new User("u1");
+        service.sendReminder(user, "Test");
+
+        verify(obs, never()).notify(any(), any());
+    }
 }

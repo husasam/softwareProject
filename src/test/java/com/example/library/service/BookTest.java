@@ -6,6 +6,13 @@ import com.example.library.model.Book;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookTest {
+	@Test
+    void testBookCreation() {
+        Book b = new Book("Title", "Author", "123");
+        assertEquals("Title", b.getTitle());
+        assertEquals("Author", b.getAuthor());
+        assertEquals("123", b.getIsbn());
+    }
 
     @Test
     public void testBookGettersAndSetters() {
@@ -65,6 +72,16 @@ public class BookTest {
         assertEquals("CLRS", book.getAuthor());
         assertEquals("111", book.getIsbn());
         assertTrue(book.isAvailable());  // عادة الكتب تكون available افتراضياً
+    }
+    @Test
+    void testBorrowDays() {
+        Book b = new Book("T", "A", "1");
+        assertEquals(28, b.getBorrowDays());
+    }
+    @Test
+    void testOverdueFine() {
+        Book b = new Book("T", "A", "1");
+        assertEquals(10.0, b.getOverdueFine());
     }
 
 }
