@@ -16,6 +16,11 @@
 <sonar.organization>husasam</sonar.organization> 
 <sonar.projectKey>husasam_softwareProject</sonar.projectKey> 
 <sonar.host.url>https://sonarcloud.io</sonar.host.url> 
+<sonar.exclusions>src/main/java/com/example/library/Main.java</sonar.exclusions>
+<sonar.coverage.exclusions>
+    src/main/java/**/model/**,
+    src/main/java/**/repository/**
+</sonar.coverage.exclusions>
 
   </properties>
 
